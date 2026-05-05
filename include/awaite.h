@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <coroutine>
+#include <future>
 struct task {
     struct promise_type {
         task get_return_object() { return {}; }
@@ -21,6 +22,7 @@ public:
     ~AWaite();
     
     auto example() -> task;
+    auto async_get_ziro() -> std::future<int>;
     
 
 private:
