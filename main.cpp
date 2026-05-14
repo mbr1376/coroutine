@@ -7,7 +7,7 @@
 #include <thread>
 #include <vector>
 
-#include "include/awaite.h"
+#include "include/await.h"
 #include "include/coroutine_task_queue.h"
 inline CoroutineTaskQueue::Task addCoroutineTask(CoroutineTaskQueue& queue,
                                                  std::function<void()> callback) {
@@ -129,7 +129,7 @@ int main() {
     // std::this_thread::sleep_for(std::chrono::seconds(2));
     // queue.shutdown();
     // sampel code for awaite
-    AWaite awaite;
-    awaite.test();
+    AWait await;
+    await.test();
     return 0;
 }

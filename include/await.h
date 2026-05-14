@@ -30,10 +30,10 @@ struct Task {
         void unhandled_exception() {}
     };
 };
-class AWaite {
+class AWait {
   public:
-    AWaite();
-    ~AWaite();
+    AWait();
+    ~AWait();
     Task test();
 
   private:

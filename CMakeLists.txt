@@ -19,7 +19,7 @@ endif()
 add_executable(coroutin
     main.cpp
     src/coroutine_task_queue.cpp
-    src/awaite.cpp
+    src/await.cpp
 )
 
 target_include_directories(coroutin PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

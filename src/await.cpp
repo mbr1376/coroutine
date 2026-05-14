@@ -1,15 +1,15 @@
-#include "include/awaite.h"
+#include "include/await.h"
 
 #include <coroutine>
 #include <future>
 #include <iostream>
 using namespace std;
 
-AWaite::AWaite() {}
+AWait::AWait() {}
 
-AWaite::~AWaite() {}
+AWait::~AWait() {}
 
-Task AWaite::test() {
+Task AWait::test() {
     int value = co_await MyAwaitable{};
 
     std::cout << value << '\n';
