@@ -7,8 +7,8 @@
 #include <thread>
 #include <vector>
 
-#include "include/coroutine_task_queue.h"
 #include "include/awaite.h"
+#include "include/coroutine_task_queue.h"
 inline CoroutineTaskQueue::Task addCoroutineTask(CoroutineTaskQueue& queue,
                                                  std::function<void()> callback) {
     callback();
@@ -130,12 +130,6 @@ int main() {
     // queue.shutdown();
     // sampel code for awaite
     AWaite awaite;
-
-    /// memory leak
-    //awaite.example();
-    //puts("main step1");
-
-    ///:async_get_ziro
-    auto future = awaite.async_get_ziro();
-    return future.get(); /// subroutine will suspend at co_await std::suspend_always{}; and main thread will wait until subroutine co_return 0; then main thread will return 0;
+    awaite.test();
+    return 0;
 }

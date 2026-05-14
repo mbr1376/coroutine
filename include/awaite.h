@@ -3,30 +3,40 @@
 
 #pragma once
 
-#include <iostream>
 #include <coroutine>
-#include <future>
-struct task {
+#include <iostream>
+
+struct MyAwaitable {
+    bool await_ready() { return false; }
+
+    void await_suspend(std::coroutine_handle<> h) {
+        std::cout << "Suspended\n";
+        h.resume();
+    }
+
+    int await_resume() { return 42; }
+};
+
+struct Task {
     struct promise_type {
-        task get_return_object() { return {}; }
+        Task get_return_object() { return {}; }
+
         std::suspend_never initial_suspend() { return {}; }
+
         std::suspend_never final_suspend() noexcept { return {}; }
+
         void return_void() {}
+
         void unhandled_exception() {}
     };
 };
-class AWaite
-{
-public:
+class AWaite {
+  public:
     AWaite();
     ~AWaite();
-    
-    auto example() -> task;
-    auto async_get_ziro() -> std::future<int>;
-    
+    Task test();
 
-private:
-
+  private:
 };
 
 #endif

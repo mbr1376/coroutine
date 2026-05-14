@@ -1,28 +1,16 @@
 #include "include/awaite.h"
-#include <iostream>
+
 #include <coroutine>
 #include <future>
+#include <iostream>
 using namespace std;
 
-AWaite::AWaite()
-{
+AWaite::AWaite() {}
 
-}
+AWaite::~AWaite() {}
 
-AWaite::~AWaite()
-{
+Task AWaite::test() {
+    int value = co_await MyAwaitable{};
 
-}
- auto AWaite::example() -> task
-{
-    puts("step1");
-    // memory leak
-    //co_await std::suspend_always{};
-    co_await std::suspend_never{};
-    puts("step2");
-}
-auto AWaite::async_get_ziro() -> std::future<int>
-{
-    co_await std::suspend_always{};
-    co_return 0;
+    std::cout << value << '\n';
 }
