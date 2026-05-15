@@ -42,6 +42,36 @@ C++20 introduces three main coroutine keywords:
 - `co_yield` – produce a value and suspend
 - `co_return` – return from a coroutine
 
+## permition Type
+**permition_type:** object for contact coroutine and runtime
+compiler make permition_type:
+    - manage state coroutine
+    - manage exception
+    - suspend behavior
+### struct Permition Type
+```cpp
+struct promise_type {
+
+    auto get_return_object();
+
+    std::suspend_never initial_suspend();
+
+    std::suspend_never final_suspend() noexcept;
+
+    void return_void();
+
+    void unhandled_exception();
+};
+
+```
+1-`get_return_object` create object return coroutine
+2- `initial_suspend` - > `std::suspend_never` or `std::suspend_always`
+3- `final_suspend()`
+4- `void return_void()` for coroutine void
+5- `return_value(int v)` for return value
+6- `unhandled_exception()` handel exeption`
+
+
 ## Await
 **await** : object `pause,resume` coroutine
 **await heart coroutine**
