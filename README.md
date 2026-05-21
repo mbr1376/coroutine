@@ -71,6 +71,14 @@ struct promise_type {
 5- `return_value(int v)` for return value
 6- `unhandled_exception()` handel exeption`
 
+**main task permition type**
+- help compile time
+- create coroutine frame
+- controle memory allocate
+- create return object
+- get value cou_return
+- manage exception
+
 
 ## Await
 **await** : object `pause,resume` coroutine
