@@ -100,7 +100,48 @@ struct promise_type {
 - Programmer can manage coroutine’s control flow with the suspension
 
 ---
+## coroutine State Machine
+**compiler make coroutine Freme**
+- `local varible`: all variable define in coroutine
+- `input parametr`
+- `Program Counter`
+- `Promise object`
+- `**Operations**`
+    - `Suspension`: co_yield or co_await
+    - `Resumption`:handle.resume
+    - `Destruction`:handle.destroy
+    - `Completion`:co_return
 
+**Task Class**
+In C++, the language doesn't give you a ready-made "Async Framework"; it gives you the tools to build one. Task is the class that you (or libraries like Asio) create to make coroutines usable by the programmer.
+- `member Data`:```cpp std::coroutine_handle<promise_type> ```
+- `memory manage`
+- `Move Semantics`
+- `Member Functions`
+    -   is_ready
+    - get
+    - resume
+```cpp
+// Task Class (ساختار داده‌ای سازمان‌دهی شده)
+struct MyTask {
+    struct promise_type { ... }; // جزئیات مدیریت کوروتین
+    std::coroutine_handle<promise_type> h;
+
+    MyTask(std::coroutine_handle<promise_type> h) : h(h) {}
+    ~MyTask() { if(h) h.destroy(); } // پاکسازی خودکار
+    
+    void next() { h.resume(); } // عملیات Resume
+};
+
+// Coroutine (توقعی که وضعیتش را حفظ می‌کند)
+MyTask count_to_two() {
+    std::cout << "1"; 
+    co_await std::suspend_always{}; // Suspension Point 1
+    std::cout << "2";
+    co_await std::suspend_always{}; // Suspension Point 2
+}
+```
+**Coroutine means "code" (stoppable logic), while the Task class means "management" (how to interact with that code and manage its memory).**
 ## Requirements
 
 - C++20 compatible compiler  
