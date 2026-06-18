@@ -167,7 +167,36 @@ std::coroutine_handle<void>
 - destroy()
 - done()
 - can not access promise
+**how co_await**
+```cpp
+struct MyAwaiter {
+    bool await_ready() {
+        return false;
+    }
 
+    void await_suspend(std::coroutine_handle<> h) {
+        // این h همان coroutine_handle<void> است
+        std::cout << "Got coroutine_handle<void>\n";
+
+        h.resume();
+    }
+
+    void await_resume() {}
+};
+
+```
+
+
+## Coroutine components
+![image](image/img3_1.png)
+![image](image/img3_2.png)
+![image](image/img3_3.png)
+![image](image/img3_4.png)
+![image](image/img3_5.png)
+![image](image/img3_6.png)
+![image](image/img3_7.png)
+
+![image](image/img3.png)
 
 ## Requirements
 
