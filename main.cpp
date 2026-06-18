@@ -7,44 +7,45 @@
 #include <thread>
 #include <vector>
 
-#include "include/await.h"
-#include "include/coroutine_task_queue.h"
-inline CoroutineTaskQueue::Task addCoroutineTask(CoroutineTaskQueue& queue,
-                                                 std::function<void()> callback) {
-    callback();
-    // Yield back to queue so other tasks can run.
-    co_await queue.requeue();
-}
+#include "include/get_handel.h"
+// #include "include/await.h"
+// #include "include/coroutine_task_queue.h"
+// inline CoroutineTaskQueue::Task addCoroutineTask(CoroutineTaskQueue& queue,
+//                                                  std::function<void()> callback) {
+//     callback();
+//     // Yield back to queue so other tasks can run.
+//     co_await queue.requeue();
+// }
 
-inline CoroutineTaskQueue::Task addCoroutineTask(
-    CoroutineTaskQueue& queue, std::function<void(const std::vector<uint8_t>&)> callback,
-    std::vector<uint8_t> data) {
-    callback(data);
-    // Yield back to queue so other tasks can run.
-    co_await queue.requeue();
-}
+// inline CoroutineTaskQueue::Task addCoroutineTask(
+//     CoroutineTaskQueue& queue, std::function<void(const std::vector<uint8_t>&)> callback,
+//     std::vector<uint8_t> data) {
+//     callback(data);
+//     // Yield back to queue so other tasks can run.
+//     co_await queue.requeue();
+// }
 
-template <class T>
-inline CoroutineTaskQueue::Task addCoroutineTask(CoroutineTaskQueue& queue,
-                                                 std::function<void(T)> callback, T data) {
-    callback(data);
-    // Yield back to queue so other tasks can run.
-    co_await queue.requeue();
-}
+// template <class T>
+// inline CoroutineTaskQueue::Task addCoroutineTask(CoroutineTaskQueue& queue,
+//                                                  std::function<void(T)> callback, T data) {
+//     callback(data);
+//     // Yield back to queue so other tasks can run.
+//     co_await queue.requeue();
+// }
 
-template <typename ResultType>
-inline CoroutineTaskQueue::Task addCoroutineTaskWithResult(
-    CoroutineTaskQueue& queue, std::function<ResultType()> func,
-    std::promise<ResultType>& resultPromise) {
-    queue.submit([func = std::move(func), &resultPromise]() mutable {
-        try {
-            resultPromise.set_value(func());
-        } catch (...) {
-            resultPromise.set_exception(std::current_exception());
-        }
-    });
-    co_return;
-}
+// template <typename ResultType>
+// inline CoroutineTaskQueue::Task addCoroutineTaskWithResult(
+//     CoroutineTaskQueue& queue, std::function<ResultType()> func,
+//     std::promise<ResultType>& resultPromise) {
+//     queue.submit([func = std::move(func), &resultPromise]() mutable {
+//         try {
+//             resultPromise.set_value(func());
+//         } catch (...) {
+//             resultPromise.set_exception(std::current_exception());
+//         }
+//     });
+//     co_return;
+// }
 //-------------------------------------------------
 namespace {
     std::mutex coutMutex;
@@ -88,8 +89,23 @@ namespace {
     // }
 
 }  // namespace
-
+Task foo() {
+    std::cout << "Hello\n";
+    co_return;
+}
+TaskPeromisType foo1() {
+    std::cout << "Inside coroutine\n";
+    co_return;
+}
 int main() {
+    Task t = foo();
+
+    t.resume();
+
+    TaskPeromisType t1 = foo1();
+    std::coroutine_handle<> vh = t1.get_void_handle();
+
+    vh.resume();
     // CoroutineTaskQueue queue(4);
 
     // // 1) addCoroutineTask with no-arg callback.
@@ -129,7 +145,8 @@ int main() {
     // std::this_thread::sleep_for(std::chrono::seconds(2));
     // queue.shutdown();
     // sampel code for awaite
-    AWait await;
-    await.test();
+    // AWait await;
+    // await.test();
+
     return 0;
 }

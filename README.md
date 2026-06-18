@@ -42,6 +42,15 @@ C++20 introduces three main coroutine keywords:
 - `co_yield` – produce a value and suspend
 - `co_return` – return from a coroutine
 
+## What are in the Coroutine Frame
+### Coroutine Frame
+    - Function Parameters (save all parametr in frame)
+    - local variables (save local variables on heap)
+    - The Promise Object (object peromis_type on frame)
+    - Suspend Point / State Machine Index
+    - Temporaries
+    - Register Spills
+
 ## permition Type
 **permition_type:** object for contact coroutine and runtime
 compiler make permition_type:
@@ -142,6 +151,24 @@ MyTask count_to_two() {
 }
 ```
 **Coroutine means "code" (stoppable logic), while the Task class means "management" (how to interact with that code and manage its memory).**
+
+## how can we acquire the coroutine_handle<void>object
+```cpp
+std::coroutine_handle<promise_type>::from_promise(*this)
+```
+### what coroutine_handle<void>
+
+```cpp
+std::coroutine_handle<>
+std::coroutine_handle<void>
+```
+**handel can :**
+- resume()
+- destroy()
+- done()
+- can not access promise
+
+
 ## Requirements
 
 - C++20 compatible compiler  
