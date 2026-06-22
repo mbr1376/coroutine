@@ -7,6 +7,7 @@
 #include <thread>
 #include <vector>
 
+#include "include/generator.h"
 #include "include/get_handel.h"
 // #include "include/await.h"
 // #include "include/coroutine_task_queue.h"
@@ -97,15 +98,27 @@ TaskPeromisType foo1() {
     std::cout << "Inside coroutine\n";
     co_return;
 }
+Generator counter() {
+    co_yield 1;
+    co_yield 2;
+    co_yield 3;
+}
 int main() {
-    Task t = foo();
+    // Task t = foo();
 
-    t.resume();
+    // t.resume();
 
-    TaskPeromisType t1 = foo1();
-    std::coroutine_handle<> vh = t1.get_void_handle();
+    // TaskPeromisType t1 = foo1();
+    // std::coroutine_handle<> vh = t1.get_void_handle();
 
-    vh.resume();
+    // vh.resume();
+
+    auto gen = counter();
+
+    while (gen.next()) {
+        std::cout << gen.value() << '\n';
+    }
+
     // CoroutineTaskQueue queue(4);
 
     // // 1) addCoroutineTask with no-arg callback.

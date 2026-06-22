@@ -198,6 +198,45 @@ struct MyAwaiter {
 
 ![image](image/img3.png)
 
+## Generate Coroutine
+**co_yield**: Similar to co_return, but the name implies suspension rather than return
+
+**what Generator?**
+ - normal function
+```cpp
+    int f() {
+    return 10;
+}
+```
+- generator
+```cpp
+Generator counter() {
+    co_yield 1;
+    co_yield 2;
+    co_yield 3;
+}
+```
+ when see Compiler `co_yield value;` convert to `co_await promise.yield_value(value);`
+
+ ### Coroutine Keyword Comparison
+
+| Keyword | Meaning |
+| :--- | :--- |
+| `co_yield` | Produces a temporary value and suspends the coroutine |
+| `co_return` | Ends the coroutine |
+| `return` | Not allowed in a coroutine |
+
+**create generator**
+```cpp
+yield_value(value)
+initial_suspend()
+final_suspend()
+return_void()
+unhandled_exception()
+get_return_object()
+```
+
+
 ## Requirements
 
 - C++20 compatible compiler  
