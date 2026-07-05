@@ -269,9 +269,38 @@ while (running) {
 }
 
 ```
+So if we send this task to the destination thread queue inside await_suspend:
 
+“task” = a lambda that calls handle.resume()
 
+That coroutine will be moved to the destination thread.
 
+**Note**
+- "Just having a coroutine" doesn't change the thread
+co_await itself is not async/threading.
+It's the awaiter and the scheduler/message queue that decide where the resume should occur.
+
+- What if the caller destroys the coroutine early?
+If you have sent the handle to the queue but the coroutine is destroyed before the queue executes it, you are facing a potential use-after-free.
+
+Solutions are usually one of the following:
+
+Keep the coroutine in a wrapper (Task) that manages the lifetime.
+Use refcount/shared_ptr for state.
+Use cancellation tokens and check "am I still alive?" before resuming.
+
+- The UI thread is usually restricted
+For example in Qt:
+
+Only the UI thread is allowed to manipulate the UI.
+
+So switch_to(ui) must be connected to Qt's own event loop (QMetaObject::invokeMethod / QCoreApplication::postEvent).
+
+- backpressure and overflow
+If the producer is faster than the consumer, the queue grows. You should have a policy:
+bounded queue
+drop/coalesce
+priority
 ## Requirements
 
 - C++20 compatible compiler  
