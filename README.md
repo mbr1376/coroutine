@@ -301,6 +301,35 @@ If the producer is faster than the consumer, the queue grows. You should have a 
 bounded queue
 drop/coalesce
 priority
+
+## await_transform
+In the standard C++20 coroutine design, the await_transform mechanism is one of the hidden and very powerful parts of promise_type. This method allows you to intercept, modify, or convert the value after co_await.
+
+In simple terms:
+
+await_transform acts as a compile-time "type translator or converter".
+
+### why?
+- Problem without await_transform
+```cpp
+co_await expression;
+```
+The compiler expects the expression itself to be an Awaitable directly (i.e., it has the await_ready, await_suspend, and await_resume methods).
+
+But if you try to co_await something that is not an awaitable (for example, a number, a raw time like std::chrono::milliseconds, or an object from another library), the compiler will throw an error.
+
+- await_transform mechanism
+If the compiler finds a method called await_transform in the promise_type class, it will filter all co_await statements within that coroutine.
+```cpp
+co_await expression;
+```
+**To**
+```cpp
+co_await promise.await_transform(expression);
+```
+With this, the output of the await_transform method should be the final object that implements the awaitable protocol.
+
+
 ## Requirements
 
 - C++20 compatible compiler  
