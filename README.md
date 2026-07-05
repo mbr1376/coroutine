@@ -236,6 +236,41 @@ unhandled_exception()
 get_return_object()
 ```
 
+## Switching Thread (Coroutine + Message Queue)
+- `coroutine`: Coroutines allow you to write code in a linear/readable way.
+- `Message Queue/EventLoop`:It gives you a scheduling mechanism.
+- `By combining the two`: when you write co_await ... in a coroutine, you can suspend the execution of the coroutine and, instead of continuing on the same thread, send a message to the destination thread's queue so that the same thread can later call resume(). Result: The continued execution of the coroutine is actually done on a new thread.
+
+#### problem
+**before coroutine:** To go from UI thread to worker and back, you usually have a callback or signal/slot or postEvent.
+
+**use Coroutine:**
+```cpp
+co_await switch_to(worker);
+do_heavy_work();
+co_await switch_to(ui);
+update_ui();
+```
+#### switch Thread in c++20
+- co_await expr causes the compiler to create a suspend point.
+- Then awaiter involves these functions:
+            `await_ready()→await_suspend(handle)→await_resume()`
+So if resume() is executed on the worker thread, the continuation of the coroutine is on the worker.
+
+#### What is the role of Message Queue?
+Message Queue is a thread-safe queue of "tasks to be executed on this thread".
+
+Each thread usually has a loop (Event Loop):
+
+```cpp
+while (running) {
+    auto job = queue.pop();   // بلوکه تا کار برسد
+    job();                    // اجرا روی همین ترد
+}
+
+```
+
+
 
 ## Requirements
 
