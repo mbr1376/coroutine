@@ -330,6 +330,102 @@ co_await promise.await_transform(expression);
 With this, the output of the await_transform method should be the final object that implements the awaitable protocol.
 
 
+#### Application scenarios
+- Suspending a coroutine for a specified period of time (std::chrono)
+Without `await_transform` you can't write co_await 100ms;. But by defining it in promise_type:
+
+```cpp
+#include <coroutine>
+#include <chrono>
+#include <iostream>
+
+struct SleepAwaiter {
+    std::chrono::milliseconds duration;
+    
+    bool await_ready() const noexcept { return false; }
+    void await_suspend(std::coroutine_handle<> h) const {
+        std::cout << "[Timer] Sleeping for " << duration.count() << "ms...\n";
+        h.resume(); 
+    }
+    void await_resume() const noexcept {}
+};
+
+struct Task {
+    struct promise_type {
+        Task get_return_object() { return Task{}; }
+        std::suspend_never initial_suspend() { return {}; }
+        std::suspend_never final_suspend() noexcept { return {}; }
+        void return_void() {}
+        void unhandled_exception() {}
+
+        template<typename Rep, typename Period>
+        SleepAwaiter await_transform(std::chrono::duration<Rep, Period> d) {
+            return SleepAwaiter{ std::chrono::duration_cast<std::chrono::milliseconds>(d) };
+        }
+    };
+};
+
+Task my_coroutine() {
+    using namespace std::chrono_literals;
+    std::cout << "Step 1\n";
+    co_await 500ms; // کامپایلر تبدیل می‌کند به: co_await promise.await_transform(500ms)
+    std::cout << "Step 2\n";
+}
+
+```
+
+- Convert `std::future` to `Awaitable` at compile time
+Suppose you want to execute standard old asynchronous functions with co_await:
+```cpp
+#include <future>
+
+template<typename T>
+struct FutureAwaiter {
+    std::future<T> fut;
+
+    bool await_ready() { 
+        // چک می‌کند که آیا تردِ کارگر تمام شده است یا نه
+        return fut.wait_for(std::chrono::seconds(0)) == std::future_status::ready; 
+    }
+    
+    void await_suspend(std::coroutine_handle<> h) {
+        // فرستادن هرموقع آماده شد برای رزومه روی ترد پول
+        std::thread([this, h]() {
+            fut.wait();
+            h.resume();
+        }).detach();
+    }
+
+    T await_resume() { 
+        return fut.get(); // بازگرداندن مقدار نهایی
+    }
+};
+
+// در promise_type کوروتینِ خود:
+template<typename T>
+FutureAwaiter<T> await_transform(std::future<T>&& fut) {
+    return FutureAwaiter<T>{ std::move(fut) };
+}
+```
+
+#### Overload Hijacking
+There is a very crucial point that can be a pain for C++ developers:
+
+Rule: If you define even one overload of await_transform in promise_type, the compiler's default behavior for the rest is disabled. That is, the compiler will try to pass anything you write in front of co_await through the await_transform input from then on.
+
+If you want standard awaiters to still work, you need to add a generic function as a fallback, like this:
+```cpp
+struct promise_type {
+    // ۱. مبدل اختصاصی شما
+    SleepAwaiter await_transform(std::chrono::milliseconds ms);
+
+    // ۲. پاس دادن بقیه Awaitableها به صورت مستقیم و بدون تغییر
+    template<typename T>
+    T&& await_transform(T&& awaitable) noexcept {
+        return std::forward<T>(awaitable);
+    }
+};
+```
 ## Requirements
 
 - C++20 compatible compiler  
